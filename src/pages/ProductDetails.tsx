@@ -1,9 +1,10 @@
 import ProductReview from '@/components/ProductReview';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
-import { useGetSingleProductsQuery } from '@/redux/api/apiSlice';
+import { useGetSingleProductsQuery } from '@/redux/features/product/productApi';
 import { addToCart } from '@/redux/features/cart/cartSlice';
 import { useAppDispatch } from '@/redux/hook';
+import { IProduct } from '@/types/globalTypes';
 import { useParams } from 'react-router-dom';
 
 export default function ProductDetails() {
@@ -17,15 +18,10 @@ export default function ProductDetails() {
   //     .then((data) => setData(data));
   // }, []);
 
-  const {
-    data: product,
-    isError,
-    isLoading,
-    isSuccess,
-  } = useGetSingleProductsQuery(id);
+  const { data: product } = useGetSingleProductsQuery(id);
   const dispatch = useAppDispatch();
 
-  const handleAddProduct = (product) => {
+  const handleAddProduct = (product: IProduct) => {
     dispatch(addToCart(product));
     toast({
       description: `${product.name} Added`,
@@ -46,14 +42,14 @@ export default function ProductDetails() {
           <h1 className="text-3xl font-semibold">{product?.name}</h1>
           <p className="text-xl">Rating: {product?.rating}</p>
           <ul className="space-y-1 text-lg">
-            {product?.features?.map((feature) => (
+            {product?.features?.map((feature: string) => (
               <li key={feature}>{feature}</li>
             ))}
           </ul>
           <Button onClick={() => handleAddProduct(product)}>Add to cart</Button>
         </div>
       </div>
-      <ProductReview />
+      {product?._id && <ProductReview productId={product?._id} />}
     </>
   );
 }
