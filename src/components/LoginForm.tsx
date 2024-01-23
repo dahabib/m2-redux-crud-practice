@@ -8,6 +8,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useForm } from 'react-hook-form';
 import { FcGoogle } from 'react-icons/fc';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
+import { useAppDispatch, useAppSelector } from '@/redux/hook';
+import { setUser } from '@/redux/features/user/userSlice';
+import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { toast } from './ui/use-toast';
 
 type UserAuthFormProps = React.HTMLAttributes<HTMLDivElement>;
 
@@ -17,6 +24,10 @@ interface LoginFormInputs {
 }
 
 export function LoginForm({ className, ...props }: UserAuthFormProps) {
+  const dispatch = useAppDispatch();
+  const { user, isLoading } = useAppSelector((state) => state.user);
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
@@ -24,8 +35,24 @@ export function LoginForm({ className, ...props }: UserAuthFormProps) {
   } = useForm<LoginFormInputs>();
 
   const onSubmit = (data: LoginFormInputs) => {
-    console.log(data);
+    const email = data.email;
+    const password = data.password;
+
+    signInWithEmailAndPassword(auth, email, password).then((userCredential) => {
+      // Signed in
+      const user = userCredential.user;
+      dispatch(setUser(user.email));
+    });
   };
+
+  useEffect(() => {
+    if (user.email && !isLoading) {
+      navigate('/');
+      toast({
+        description: 'Logged in.',
+      });
+    }
+  }, [user.email, isLoading, navigate]);
 
   return (
     <div className={cn('grid gap-6', className)} {...props}>

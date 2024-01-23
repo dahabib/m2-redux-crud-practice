@@ -27,8 +27,6 @@ export function SignupForm({ className, ...props }: UserAuthFormProps) {
   } = useForm<SignupFormInputs>();
 
   const onSubmit = (data: SignupFormInputs) => {
-    console.log(data);
-
     dispatch(createUser({ email: data.email, password: data.password }));
   };
 
