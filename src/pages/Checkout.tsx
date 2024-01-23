@@ -15,7 +15,7 @@ export default function Checkout() {
   const { products } = useAppSelector((state) => state.cart);
 
   const subTotal = calculateTotalPrice(products);
-  const deliveryCharge = Number(50);
+  const deliveryCharge = subTotal !== 0 ? Number(50) : 0;
   const total = subTotal + deliveryCharge;
 
   return (

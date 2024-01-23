@@ -3,24 +3,26 @@ import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/components/ui/use-toast';
+import { useGetProductsQuery } from '@/redux/api/apiSlice';
 import {
   toggleStatus,
   setPriceRange,
 } from '@/redux/features/product/productSlice';
 import { useAppDispatch, useAppSelector } from '@/redux/hook';
-import { IProduct } from '@/types/globalTypes';
-import { useEffect, useState } from 'react';
 
 export default function Products() {
-  const [data, setData] = useState<IProduct[]>([]);
+  // const [data, setData] = useState<IProduct[]>([]);
   const { status, priceRange } = useAppSelector((state) => state.product);
   const dispatch = useAppDispatch();
 
-  useEffect(() => {
-    fetch('./data.json')
-      .then((res) => res.json())
-      .then((data) => setData(data));
-  }, []);
+  const { isLoading, isError, isSuccess, data } =
+    useGetProductsQuery(undefined);
+
+  // useEffect(() => {
+  //   fetch('./data.json')
+  //     .then((res) => res.json())
+  //     .then((data) => setData(data));
+  // }, []);
 
   const { toast } = useToast();
 
@@ -31,11 +33,11 @@ export default function Products() {
   let productsData;
 
   if (status) {
-    productsData = data.filter(
+    productsData = data?.data?.filter(
       (item) => item.status === true && item.price < priceRange
     );
   } else if (priceRange > 0) {
-    productsData = data.filter((item) => item.price < priceRange);
+    productsData = data?.data?.filter((item) => item.price < priceRange);
   } else {
     productsData = data;
   }
